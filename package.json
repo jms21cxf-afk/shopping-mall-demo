@@ -1,0 +1,12 @@
+{
+  "name": "shopping-mall-demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm start --prefix server",
+    "heroku-postbuild": "npm install --prefix server"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
