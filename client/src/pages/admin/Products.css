@@ -1,0 +1,237 @@
+.products-page {
+  min-height: 100vh;
+  padding: 2rem 1.5rem 3rem;
+  background: #fafcff;
+}
+
+.products-card {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(148, 163, 184, 0.08);
+}
+
+.products-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.products-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.products-header p {
+  margin: 0 0 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.products-add-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.625rem 1rem;
+  border: 1px solid #7eb3f0;
+  border-radius: 10px;
+  background: #f0f7ff;
+  color: #3b82c4;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.products-add-link:hover {
+  background: #e7f2ff;
+}
+
+.products-status {
+  margin: 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.products-error {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  text-align: center;
+}
+
+.products-table-wrap {
+  overflow-x: auto;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.products-table th,
+.products-table td {
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid #f3f4f6;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.products-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.products-table td {
+  color: #111827;
+}
+
+.products-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.products-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.products-name {
+  min-width: 140px;
+  white-space: normal;
+}
+
+.products-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.products-edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #7eb3f0;
+  border-radius: 8px;
+  background: #f0f7ff;
+  color: #3b82c4;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.products-edit-button:hover {
+  background: #e7f2ff;
+}
+
+.products-delete-button {
+  min-width: 56px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.products-delete-button:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.products-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.products-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.products-page-button,
+.products-page-number {
+  min-height: 36px;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.products-page-button:hover:not(:disabled),
+.products-page-number:hover {
+  background: #f9fafb;
+}
+
+.products-page-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.products-page-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.products-page-number.is-active {
+  border-color: #7eb3f0;
+  background: #f0f7ff;
+  color: #3b82c4;
+}
+
+.products-footer {
+  margin: 1.5rem 0 0;
+  text-align: center;
+}
+
+.products-footer a {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.products-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .products-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .products-table {
+    font-size: 0.8125rem;
+  }
+
+  .products-pagination {
+    flex-wrap: wrap;
+  }
+}

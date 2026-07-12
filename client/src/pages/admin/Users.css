@@ -1,0 +1,107 @@
+.users-page {
+  min-height: 100vh;
+  padding: 2rem 1.5rem 3rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.users-card {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.06),
+    0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.users-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.users-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #111827;
+}
+
+.users-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.users-status {
+  margin: 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.users-error {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  text-align: center;
+}
+
+.users-table-wrap {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.users-table th,
+.users-table td {
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid #f3f4f6;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.users-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+}
+
+.users-table td {
+  color: #111827;
+}
+
+.users-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.users-footer {
+  margin: 1.5rem 0 0;
+  text-align: center;
+}
+
+.users-footer a {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.users-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .users-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .users-table {
+    font-size: 0.8125rem;
+  }
+}

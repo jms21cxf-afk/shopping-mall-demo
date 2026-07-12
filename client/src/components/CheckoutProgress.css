@@ -1,0 +1,96 @@
+.checkout-progress {
+  margin-bottom: 2rem;
+}
+
+.checkout-progress-list {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkout-progress-item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  max-width: 140px;
+  color: #9ca3af;
+}
+
+.checkout-progress-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.checkout-progress-label {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.checkout-progress-line {
+  position: absolute;
+  top: 1rem;
+  left: calc(50% + 1rem);
+  width: calc(100% - 2rem);
+  height: 2px;
+  background: #e5e7eb;
+}
+
+.checkout-progress-item.is-active {
+  color: #111827;
+}
+
+.checkout-progress-item.is-active .checkout-progress-marker {
+  background: #111827;
+}
+
+.checkout-progress-item.is-active .checkout-progress-label {
+  font-weight: 700;
+}
+
+.checkout-progress-item.is-complete {
+  color: #111827;
+}
+
+.checkout-progress-item.is-complete .checkout-progress-marker {
+  background: #111827;
+}
+
+.checkout-progress-item.is-complete .checkout-progress-line {
+  background: #111827;
+}
+
+.checkout-progress-item:last-child .checkout-progress-line {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .checkout-progress-label {
+    font-size: 0.75rem;
+  }
+
+  .checkout-progress-marker {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .checkout-progress-line {
+    top: 0.875rem;
+  }
+}
