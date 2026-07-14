@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import PageLanguageBar from '@/components/PageLanguageBar'
 import { checkUsername, createUser, loginUser } from '@/api/client'
+import { useLanguage } from '@/i18n/LanguageContext'
 import { saveAuth } from '@/utils/auth'
 import './Signup.css'
 
@@ -65,6 +67,7 @@ function PasswordInput({
 
 function Signup() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [form, setForm] = useState({
     username: '',
     name: '',
@@ -93,16 +96,16 @@ function Signup() {
 
   const agreementItems = useMemo(
     () => [
-      { key: 'terms', label: '이용약관 동의', required: true, hasView: true },
-      { key: 'privacy', label: '개인정보처리방침 동의', required: true, hasView: true },
+      { key: 'terms', label: t('signupAgreeTerms'), required: true, hasView: true },
+      { key: 'privacy', label: t('signupAgreePrivacy'), required: true, hasView: true },
       {
         key: 'marketing',
-        label: '마케팅 정보 수신 동의',
+        label: t('signupAgreeMarketing'),
         required: false,
         hasView: false,
       },
     ],
-    [],
+    [t],
   )
 
   const handleChange = (event) => {
@@ -125,7 +128,7 @@ function Signup() {
       setUsernameStatus({
         checked: false,
         available: false,
-        message: '아이디를 입력해 주세요.',
+        message: t('signupEnterUsername'),
       })
       return
     }
@@ -140,20 +143,20 @@ function Signup() {
         setUsernameStatus({
           checked: true,
           available: true,
-          message: '사용 가능한 아이디입니다.',
+          message: t('signupUsernameAvailable'),
         })
       } else {
         setUsernameStatus({
           checked: true,
           available: false,
-          message: '이미 사용 중인 아이디입니다.',
+          message: t('signupUsernameTaken'),
         })
       }
     } catch (checkError) {
       setUsernameStatus({
         checked: false,
         available: false,
-        message: checkError.message || '중복 확인에 실패했습니다.',
+        message: checkError.message || t('signupCheckFailed'),
       })
     } finally {
       setIsCheckingUsername(false)
@@ -188,27 +191,27 @@ function Signup() {
     const name = form.name.trim()
 
     if (!username || !name || !form.email || !form.password) {
-      setError('필수 항목을 모두 입력해 주세요.')
+      setError(t('signupRequiredFields'))
       return
     }
 
     if (!usernameStatus.checked || !usernameStatus.available) {
-      setError('아이디 중복 확인을 해주세요.')
+      setError(t('signupCheckUsernameRequired'))
       return
     }
 
     if (!PASSWORD_PATTERN.test(form.password)) {
-      setError('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.')
+      setError(t('signupInvalidPassword'))
       return
     }
 
     if (form.password !== form.confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.')
+      setError(t('signupPasswordMismatch'))
       return
     }
 
     if (!agreements.terms || !agreements.privacy) {
-      setError('필수 약관에 동의해 주세요.')
+      setError(t('signupAgreementsRequired'))
       return
     }
 
@@ -232,182 +235,185 @@ function Signup() {
       saveAuth(loginResult.token, loginResult.user)
       navigate('/')
     } catch (submitError) {
-      setError(submitError.message || '회원가입에 실패했습니다.')
+      setError(submitError.message || t('signupFailed'))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <main className="signup-page">
-      <div className="signup-card">
-        <p className="signup-brand">Shopping Mall</p>
-        <header className="signup-header">
-          <h1>회원가입</h1>
-          <p>새로운 계정을 만들어 쇼핑을 시작하세요</p>
-        </header>
+    <>
+      <PageLanguageBar />
+      <main className="signup-page">
+        <div className="signup-card">
+          <p className="signup-brand">Shopping Mall</p>
+          <header className="signup-header">
+            <h1>{t('signupTitle')}</h1>
+            <p>{t('signupSubtitle')}</p>
+          </header>
 
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <p className="required-notice">
-            <span className="required-mark">*</span> 표시는 필수 입력 항목입니다.
-          </p>
+          <form className="signup-form" onSubmit={handleSubmit}>
+            <p className="required-notice">
+              <span className="required-mark">*</span> {t('signupRequiredNotice')}
+            </p>
 
-          <section className="form-section">
-            <h2 className="form-section-title">기본 정보</h2>
+            <section className="form-section">
+              <h2 className="form-section-title">{t('signupBasicInfo')}</h2>
 
-            <div className="field">
-              <FieldLabel required>아이디</FieldLabel>
-              <div className="username-row">
+              <div className="field">
+                <FieldLabel required>{t('signupUsername')}</FieldLabel>
+                <div className="username-row">
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder={t('loginUsernamePlaceholder')}
+                    value={form.username}
+                    onChange={handleChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="check-button"
+                    onClick={handleCheckUsername}
+                    disabled={isCheckingUsername}
+                  >
+                    {isCheckingUsername ? t('signupCheckingUsername') : t('signupCheckUsername')}
+                  </button>
+                </div>
+                {usernameStatus.message && (
+                  <small
+                    className={
+                      usernameStatus.available
+                        ? 'username-message success'
+                        : 'username-message error'
+                    }
+                  >
+                    {usernameStatus.message}
+                  </small>
+                )}
+              </div>
+
+              <label className="field">
+                <FieldLabel required>{t('signupName')}</FieldLabel>
                 <input
                   type="text"
-                  name="username"
-                  placeholder="아이디를 입력하세요"
-                  value={form.username}
+                  name="name"
+                  placeholder={t('signupName')}
+                  value={form.name}
                   onChange={handleChange}
                   required
                 />
-                <button
-                  type="button"
-                  className="check-button"
-                  onClick={handleCheckUsername}
-                  disabled={isCheckingUsername}
-                >
-                  {isCheckingUsername ? '확인 중...' : '중복확인'}
-                </button>
-              </div>
-              {usernameStatus.message && (
-                <small
-                  className={
-                    usernameStatus.available
-                      ? 'username-message success'
-                      : 'username-message error'
-                  }
-                >
-                  {usernameStatus.message}
-                </small>
-              )}
-            </div>
+              </label>
 
-          <label className="field">
-            <FieldLabel required>이름</FieldLabel>
-            <input
-              type="text"
-              name="name"
-              placeholder="이름을 입력하세요"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-          </label>
+              <label className="field">
+                <FieldLabel required>{t('signupEmail')}</FieldLabel>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="your@email.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
 
-          <label className="field">
-            <FieldLabel required>이메일</FieldLabel>
-            <input
-              type="email"
-              name="email"
-              placeholder="your@email.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
+              <label className="field">
+                <FieldLabel>{t('signupPhone')}</FieldLabel>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="010-1234-5678"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+              </label>
+            </section>
 
-          <label className="field">
-            <FieldLabel>전화번호</FieldLabel>
-            <input
-              type="tel"
-              name="phone"
-              placeholder="010-1234-5678"
-              value={form.phone}
-              onChange={handleChange}
-            />
-          </label>
-          </section>
+            <section className="form-section">
+              <h2 className="form-section-title">{t('signupPasswordSection')}</h2>
 
-          <section className="form-section">
-            <h2 className="form-section-title">비밀번호</h2>
+              <label className="field">
+                <FieldLabel required>{t('signupPassword')}</FieldLabel>
+                <PasswordInput
+                  name="password"
+                  value={form.password}
+                  placeholder={t('loginPasswordPlaceholder')}
+                  onChange={handleChange}
+                  visible={showPassword}
+                  onToggle={() => setShowPassword((prev) => !prev)}
+                  toggleLabel={t('signupTogglePassword')}
+                />
+                <small>{t('signupPasswordHint')}</small>
+              </label>
 
-            <label className="field">
-              <FieldLabel required>비밀번호</FieldLabel>
-              <PasswordInput
-              name="password"
-              value={form.password}
-              placeholder="비밀번호를 입력하세요"
-              onChange={handleChange}
-              visible={showPassword}
-              onToggle={() => setShowPassword((prev) => !prev)}
-              toggleLabel="비밀번호 표시 전환"
-            />
-            <small>8자 이상, 영문, 숫자, 특수문자 포함</small>
-          </label>
+              <label className="field">
+                <FieldLabel required>{t('signupConfirmPassword')}</FieldLabel>
+                <PasswordInput
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  placeholder={t('loginPasswordPlaceholder')}
+                  onChange={handleChange}
+                  visible={showConfirmPassword}
+                  onToggle={() => setShowConfirmPassword((prev) => !prev)}
+                  toggleLabel={t('signupTogglePassword')}
+                />
+              </label>
+            </section>
 
-          <label className="field">
-            <FieldLabel required>비밀번호 확인</FieldLabel>
-            <PasswordInput
-              name="confirmPassword"
-              value={form.confirmPassword}
-              placeholder="비밀번호를 다시 입력하세요"
-              onChange={handleChange}
-              visible={showConfirmPassword}
-              onToggle={() => setShowConfirmPassword((prev) => !prev)}
-              toggleLabel="비밀번호 확인 표시 전환"
-            />
-          </label>
-          </section>
+            <section className="form-section agreements-section">
+              <h2 className="form-section-title">{t('signupAgreements')}</h2>
 
-          <section className="form-section agreements-section">
-            <h2 className="form-section-title">약관 동의</h2>
+              <div className="agreements">
+                <label className="agreement-item agreement-all">
+                  <input
+                    type="checkbox"
+                    checked={agreements.all}
+                    onChange={() => handleAgreementChange('all')}
+                  />
+                  <span>{t('signupAgreeAll')}</span>
+                </label>
 
-            <div className="agreements">
-            <label className="agreement-item agreement-all">
-              <input
-                type="checkbox"
-                checked={agreements.all}
-                onChange={() => handleAgreementChange('all')}
-              />
-              <span>전체 동의</span>
-            </label>
-
-            <div className="agreement-list">
-              {agreementItems.map((item) => (
-                <div key={item.key} className="agreement-item">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={agreements[item.key]}
-                      onChange={() => handleAgreementChange(item.key)}
-                    />
-                    <span className="agreement-label">
-                      {item.label}
-                      {item.required && (
-                        <span className="required-mark">*</span>
+                <div className="agreement-list">
+                  {agreementItems.map((item) => (
+                    <div key={item.key} className="agreement-item">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={agreements[item.key]}
+                          onChange={() => handleAgreementChange(item.key)}
+                        />
+                        <span className="agreement-label">
+                          {item.label}
+                          {item.required && (
+                            <span className="required-mark">*</span>
+                          )}
+                        </span>
+                      </label>
+                      {item.hasView && (
+                        <button type="button" className="view-link">
+                          {t('signupView')}
+                        </button>
                       )}
-                    </span>
-                  </label>
-                  {item.hasView && (
-                    <button type="button" className="view-link">
-                      보기
-                    </button>
-                  )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            </div>
-          </section>
+              </div>
+            </section>
 
-          {error && <p className="form-error">{error}</p>}
-          {successMessage && <p className="form-success">{successMessage}</p>}
+            {error && <p className="form-error">{error}</p>}
+            {successMessage && <p className="form-success">{successMessage}</p>}
 
-          <button type="submit" className="submit-button" disabled={isSubmitting}>
-            {isSubmitting ? '가입 중...' : '회원가입'}
-          </button>
-        </form>
+            <button type="submit" className="submit-button" disabled={isSubmitting}>
+              {isSubmitting ? t('signupSubmitting') : t('signupSubmit')}
+            </button>
+          </form>
 
-        <p className="signup-footer">
-          이미 계정이 있으신가요? <Link to="/">메인으로 돌아가기</Link>
-        </p>
-      </div>
-    </main>
+          <p className="signup-footer">
+            {t('signupHasAccount')} <Link to="/">{t('signupBackHome')}</Link>
+          </p>
+        </div>
+      </main>
+    </>
   )
 }
 

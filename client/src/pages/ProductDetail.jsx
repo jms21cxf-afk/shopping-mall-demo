@@ -1,32 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import GlobalLanguageControls from '@/components/GlobalLanguageControls'
 import { addCartItem, getProduct } from '@/api/client'
+import { useLanguage } from '@/i18n/LanguageContext'
+import { getCategoryFeatures, getCategoryLabel } from '@/i18n/orderI18n'
 import { getStoredUser, isLoggedIn } from '@/utils/auth'
 import './ProductDetail.css'
-
-const CATEGORY_LABELS = {
-  cleansing: '클렌징',
-  toner: '토너',
-  essence: '에센스',
-  cream: '크림',
-  suncare: '선케어',
-}
-
-const CATEGORY_FEATURES = {
-  cleansing: ['저자극 세정', '촉촉한 마무리', '데일리 클렌징'],
-  toner: ['피부 결 정돈', '수분 공급', 'pH 밸런스'],
-  essence: ['영양 공급', '피부 결 케어', '흡수력 향상'],
-  cream: ['보습 강화', '피부 장벽', '촉촉한 마무리'],
-  suncare: ['자외선 차단', '가벼운 사용감', '데일리 선케어'],
-}
-
-function formatPrice(price) {
-  return `${Number(price).toLocaleString('ko-KR')}원`
-}
 
 function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t, formatPrice } = useLanguage()
   const user = getStoredUser()
   const [product, setProduct] = useState(null)
   const [error, setError] = useState('')
@@ -45,12 +29,12 @@ function ProductDetail() {
         setProduct(data)
       })
       .catch((fetchError) => {
-        setError(fetchError.message || '상품 정보를 불러오지 못했습니다.')
+        setError(fetchError.message || t('productLoadError'))
       })
       .finally(() => {
         setIsLoading(false)
       })
-  }, [id])
+  }, [id, t])
 
   // 상품 상세 페이지의 "장바구니" 버튼 클릭 시 호출
   const handleAddToCart = async () => {
@@ -63,9 +47,9 @@ function ProductDetail() {
 
     try {
       await addCartItem(product._id, quantity)
-      window.alert('장바구니에 담았습니다.')
+      window.alert(t('productAddedToCart'))
     } catch (cartError) {
-      window.alert(cartError.message || '장바구니 담기에 실패했습니다.')
+      window.alert(cartError.message || t('productAddFailed'))
     } finally {
       setIsAddingToCart(false)
     }
@@ -84,14 +68,14 @@ function ProductDetail() {
       await addCartItem(product._id, quantity)
       navigate('/checkout')
     } catch (buyError) {
-      window.alert(buyError.message || '주문 페이지로 이동하지 못했습니다.')
+      window.alert(buyError.message || t('productBuyFailed'))
     } finally {
       setIsBuying(false)
     }
   }
 
   const handleDemoAction = (label) => {
-    window.alert(`데모 버전입니다. ${label} 기능은 준비 중입니다.`)
+    window.alert(t('productDemoAlert', { label }))
   }
 
   const decreaseQuantity = () => {
@@ -102,10 +86,15 @@ function ProductDetail() {
     setQuantity((prev) => prev + 1)
   }
 
+  const howToSteps = useMemo(
+    () => [t('howToStep1'), t('howToStep2'), t('howToStep3')],
+    [t],
+  )
+
   if (isLoading) {
     return (
       <div className="product-detail-page">
-        <p className="product-detail-status">상품을 불러오는 중...</p>
+        <p className="product-detail-status">{t('productLoading')}</p>
       </div>
     )
   }
@@ -113,36 +102,36 @@ function ProductDetail() {
   if (error || !product) {
     return (
       <div className="product-detail-page">
-        <p className="product-detail-error">{error || '상품을 찾을 수 없습니다.'}</p>
+        <p className="product-detail-error">{error || t('productNotFound')}</p>
         <Link to="/" className="product-detail-back">
-          쇼핑몰로 돌아가기
+          {t('productBackHome')}
         </Link>
       </div>
     )
   }
 
-  const categoryLabel = CATEGORY_LABELS[product.category] || product.category
-  const features = CATEGORY_FEATURES[product.category] || CATEGORY_FEATURES.essence
+  const categoryLabel = getCategoryLabel(product.category, t)
+  const features = getCategoryFeatures(product.category, t)
   const storyText =
-    product.description ||
-    `${product.name}은(는) 피부 본연의 아름다움을 살려주는 데일리 스킨케어 제품입니다. 부드럽고 편안한 사용감으로 매일 사용하기 좋습니다.`
+    product.description || t('productDefaultStory', { name: product.name })
   const totalPrice = product.price * quantity
 
   return (
     <div className="product-detail-page">
       <header className="product-detail-header">
         <button type="button" className="product-detail-nav-button" onClick={() => navigate(-1)}>
-          ← Back
+          {t('productBack')}
         </button>
         <Link to="/" className="product-detail-logo">
           Shopping Mall Demo
         </Link>
         <div className="product-detail-header-actions">
+          <GlobalLanguageControls />
           {user ? (
-            <span className="product-detail-user">{user.name}님</span>
+            <span className="product-detail-user">{t('welcome', { name: user.name })}</span>
           ) : (
             <Link to="/login" className="product-detail-nav-link">
-              Login
+              {t('login')}
             </Link>
           )}
         </div>
@@ -157,7 +146,7 @@ function ProductDetail() {
           <section className="detail-intro">
             <p className="detail-category">{categoryLabel}</p>
             <h1 className="detail-title">{product.name}</h1>
-            <p className="detail-subtitle">Daily skincare for natural beauty</p>
+            <p className="detail-subtitle">{t('productSubtitle')}</p>
             <div className="detail-pills">
               {features.map((feature) => (
                 <span key={feature} className="detail-pill">
@@ -171,45 +160,45 @@ function ProductDetail() {
             <div className="detail-story-image-wrap">
               <img src={product.image} alt="" className="detail-story-image" />
             </div>
-            <h2>Product Story</h2>
+            <h2>{t('productStory')}</h2>
             <p>{storyText}</p>
           </section>
 
           <section className="detail-features">
-            <h2>Key Benefits</h2>
+            <h2>{t('productKeyBenefits')}</h2>
             <div className="detail-feature-grid">
               {features.map((feature, index) => (
                 <article key={feature} className="detail-feature-card">
                   <span className="detail-feature-number">{String(index + 1).padStart(2, '0')}</span>
                   <h3>{feature}</h3>
-                  <p>매일 사용하기 좋은 {categoryLabel} 케어 포인트입니다.</p>
+                  <p>{t('productFeatureDesc', { category: categoryLabel })}</p>
                 </article>
               ))}
             </div>
           </section>
 
           <section className="detail-how-to">
-            <h2>How To Use</h2>
+            <h2>{t('productHowToUse')}</h2>
             <ol>
-              <li>적당량을 덜어 손바닥에 올립니다.</li>
-              <li>피부결을 따라 부드럽게 펴 발라줍니다.</li>
-              <li>흡수시킨 후 다음 스킨케어 단계로 넘어갑니다.</li>
+              {howToSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
             </ol>
           </section>
 
           <section className="detail-info">
-            <h2>Product Info</h2>
+            <h2>{t('productInfo')}</h2>
             <dl className="detail-info-list">
               <div>
                 <dt>SKU</dt>
                 <dd>{product.sku}</dd>
               </div>
               <div>
-                <dt>카테고리</dt>
+                <dt>{t('productCategory')}</dt>
                 <dd>{categoryLabel}</dd>
               </div>
               <div>
-                <dt>판매가</dt>
+                <dt>{t('productPrice')}</dt>
                 <dd>{formatPrice(product.price)}</dd>
               </div>
             </dl>
@@ -224,11 +213,11 @@ function ProductDetail() {
             <div className="detail-quantity-row">
               <span className="detail-quantity-label">{product.name}</span>
               <div className="detail-quantity-control">
-                <button type="button" onClick={decreaseQuantity} aria-label="수량 감소">
+                <button type="button" onClick={decreaseQuantity} aria-label={t('cartQuantityDecrease')}>
                   −
                 </button>
                 <span>{quantity}</span>
-                <button type="button" onClick={increaseQuantity} aria-label="수량 증가">
+                <button type="button" onClick={increaseQuantity} aria-label={t('cartQuantityIncrease')}>
                   +
                 </button>
               </div>
@@ -236,7 +225,7 @@ function ProductDetail() {
             </div>
 
             <div className="detail-total-row">
-              <span>총 상품금액({quantity}개)</span>
+              <span>{t('productTotalItems', { quantity })}</span>
               <strong>{formatPrice(totalPrice)}</strong>
             </div>
 
@@ -247,7 +236,7 @@ function ProductDetail() {
                 onClick={handleBuyNow}
                 disabled={isBuying}
               >
-                {isBuying ? '이동 중...' : '구매하기'}
+                {isBuying ? t('productBuying') : t('productBuyNow')}
               </button>
               <button
                 type="button"
@@ -255,13 +244,13 @@ function ProductDetail() {
                 onClick={handleAddToCart}
                 disabled={isAddingToCart}
               >
-                {isAddingToCart ? '담는 중...' : '장바구니'}
+                {isAddingToCart ? t('productAdding') : t('productAddToCart')}
               </button>
               <button
                 type="button"
                 className="detail-wish-button"
-                onClick={() => handleDemoAction('찜하기')}
-                aria-label="찜하기"
+                onClick={() => handleDemoAction(t('productWishlist'))}
+                aria-label={t('productWishlist')}
               >
                 ♡
               </button>
@@ -270,16 +259,16 @@ function ProductDetail() {
             <button
               type="button"
               className="detail-npay-button"
-              onClick={() => handleDemoAction('N pay')}
+              onClick={() => handleDemoAction(t('productNpay'))}
             >
-              N pay 구매
+              {t('productNpay')}
             </button>
             <button
               type="button"
               className="detail-kakao-button"
-              onClick={() => handleDemoAction('간편구매')}
+              onClick={() => handleDemoAction(t('productKakaoBuy'))}
             >
-              톡 간편구매
+              {t('productKakaoBuy')}
             </button>
 
             <div className="detail-accordion">

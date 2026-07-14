@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Main from '@/pages/Main'
 import Login from '@/pages/Login'
+import KakaoCallback from '@/pages/KakaoCallback'
+import GoogleCallback from '@/pages/GoogleCallback'
 import Signup from '@/pages/Signup'
 import Admin from '@/pages/admin/Admin'
 import Users from '@/pages/admin/Users'
@@ -42,6 +44,14 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/auth/kakao/callback',
+    element: <KakaoCallback />,
+  },
+  {
+    path: '/auth/google/callback',
+    element: <GoogleCallback />,
   },
   {
     path: '/signup',

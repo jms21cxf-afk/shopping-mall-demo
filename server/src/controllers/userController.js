@@ -209,6 +209,10 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+const getCurrentUser = async (req, res) => {
+  res.json(omitPassword(req.user));
+};
+
 const deleteUser = async (req, res, next) => {
   try {
     if (!isValidObjectId(req.params.id)) {
@@ -230,6 +234,7 @@ const deleteUser = async (req, res, next) => {
 module.exports = {
   getUsers,
   getUserById,
+  getCurrentUser,
   checkUsername,
   loginUser,
   createUser,

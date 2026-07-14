@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getBestSellerProducts, getCart, getProducts } from '@/api/client'
+import { translate } from '@/i18n/translations'
+import { useLanguage } from '@/i18n/LanguageContext'
+import GlobalLanguageControls from '@/components/GlobalLanguageControls'
 import { clearAuth, getStoredUser, isLoggedIn } from '@/utils/auth'
 import { getCartItemCount } from '@/utils/cart'
 import './Main.css'
@@ -14,24 +17,29 @@ function CartIcon() {
   )
 }
 
-const NAV_LEFT = ['Shop', 'Brand', 'Collection', 'Event']
-const NAV_SUB = ['Brand story', 'Our stockist']
-
-const SHOP_CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'cleansing', label: '클렌징' },
-  { value: 'toner', label: '토너' },
-  { value: 'essence', label: '에센스' },
-  { value: 'cream', label: '크림' },
-  { value: 'suncare', label: '선케어' },
+const NAV_LEFT = [
+  { key: 'navShop', value: 'Shop' },
+  { key: 'navBrand', value: 'Brand' },
+  { key: 'navCollection', value: 'Collection' },
+  { key: 'navEvent', value: 'Event' },
+]
+const NAV_SUB = [
+  { key: 'navBrandStory', value: 'Brand story' },
+  { key: 'navOurStockist', value: 'Our stockist' },
 ]
 
-function formatPrice(price) {
-  return `₩${Number(price).toLocaleString('ko-KR')}`
-}
+const SHOP_CATEGORIES = [
+  { value: 'all', labelKey: 'categoryAll' },
+  { value: 'cleansing', labelKey: 'categoryCleansing' },
+  { value: 'toner', labelKey: 'categoryToner' },
+  { value: 'essence', labelKey: 'categoryEssence' },
+  { value: 'cream', labelKey: 'categoryCream' },
+  { value: 'suncare', labelKey: 'categorySuncare' },
+]
 
 function Main() {
   const navigate = useNavigate()
+  const { language, t, formatPrice } = useLanguage()
   const [user, setUser] = useState(() => getStoredUser())
   const [isShopOpen, setIsShopOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -86,7 +94,7 @@ function Main() {
         setBestSellers(data)
       })
       .catch((error) => {
-        setBestSellersError(error.message || '베스트 상품을 불러오지 못했습니다.')
+        setBestSellersError(error.message || translate(language, 'loadBestSellersError'))
         setBestSellers([])
       })
       .finally(() => {
@@ -108,13 +116,13 @@ function Main() {
         setProducts(data)
       })
       .catch((error) => {
-        setProductsError(error.message || '상품을 불러오지 못했습니다.')
+        setProductsError(error.message || translate(language, 'loadProductsError'))
         setProducts([])
       })
       .finally(() => {
         setIsLoadingProducts(false)
       })
-  }, [isShopOpen, selectedCategory])
+  }, [isShopOpen, selectedCategory, language])
 
   const handleLogout = () => {
     clearAuth()
@@ -140,7 +148,7 @@ function Main() {
   }
 
   const handleNavClick = (item, event) => {
-    if (item === 'Shop') {
+    if (item.value === 'Shop') {
       handleShopClick(event)
       return
     }
@@ -155,13 +163,13 @@ function Main() {
         <nav className="nav-top" aria-label="Primary">
           <ul className="nav-left">
             {NAV_LEFT.map((item) => (
-              <li key={item}>
+              <li key={item.value}>
                 <a
                   href="#"
-                  className={item === 'Shop' && isShopOpen ? 'is-active' : undefined}
+                  className={item.value === 'Shop' && isShopOpen ? 'is-active' : undefined}
                   onClick={(event) => handleNavClick(item, event)}
                 >
-                  {item}
+                  {t(item.key)}
                 </a>
               </li>
             ))}
@@ -177,11 +185,12 @@ function Main() {
               type="button"
               className="nav-cart-button"
               onClick={handleCartClick}
-              aria-label={`장바구니 ${cartCount}개`}
+              aria-label={t('cartCount', { count: cartCount })}
             >
               <CartIcon />
               {cartCount > 0 && <span className="nav-cart-badge">{cartCount}</span>}
             </button>
+            <GlobalLanguageControls />
             {user ? (
               <div className="nav-user-menu" ref={userMenuRef}>
                 <button
@@ -191,7 +200,7 @@ function Main() {
                   aria-haspopup="menu"
                   onClick={() => setIsUserMenuOpen((prev) => !prev)}
                 >
-                  {user.name}님 환영합니다
+                  {t('welcome', { name: user.name })}
                   <span className="nav-user-menu-chevron" aria-hidden="true">
                     ▾
                   </span>
@@ -204,7 +213,7 @@ function Main() {
                       role="menuitem"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      주문 내역
+                      {t('orders')}
                     </Link>
                     {isAdmin && (
                       <Link
@@ -213,7 +222,7 @@ function Main() {
                         role="menuitem"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
-                        어드민
+                        {t('admin')}
                       </Link>
                     )}
                     <button
@@ -222,19 +231,19 @@ function Main() {
                       role="menuitem"
                       onClick={handleLogout}
                     >
-                      로그아웃
+                      {t('logout')}
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <Link to="/login" className="nav-link">
-                로그인
+                {t('login')}
               </Link>
             )}
             {!user && (
               <Link to="/signup" className="nav-link">
-                회원가입
+                {t('signup')}
               </Link>
             )}
           </div>
@@ -253,15 +262,15 @@ function Main() {
                 }
                 onClick={() => setSelectedCategory(category.value)}
               >
-                {category.label}
+                {t(category.labelKey)}
               </button>
             ))}
           </nav>
         ) : (
           <nav className="nav-sub" aria-label="Secondary">
             {NAV_SUB.map((item) => (
-              <a key={item} href="#">
-                {item}
+              <a key={item.value} href="#">
+                {t(item.key)}
               </a>
             ))}
           </nav>
@@ -270,11 +279,11 @@ function Main() {
 
       {isShopOpen ? (
         <section className="shop-section">
-          {isLoadingProducts && <p className="shop-status">상품을 불러오는 중...</p>}
+          {isLoadingProducts && <p className="shop-status">{t('loadingProducts')}</p>}
           {productsError && <p className="shop-error">{productsError}</p>}
 
           {!isLoadingProducts && !productsError && products.length === 0 && (
-            <p className="shop-status">등록된 상품이 없습니다.</p>
+            <p className="shop-status">{t('noProducts')}</p>
           )}
 
           {!isLoadingProducts && !productsError && products.length > 0 && (
@@ -300,37 +309,35 @@ function Main() {
         <>
           <section className="hero">
             <div className="hero-copy">
-              <p className="hero-eyebrow">NEW ARRIVAL</p>
+              <p className="hero-eyebrow">{t('heroEyebrow')}</p>
               <h1 className="hero-title">
-                <span className="hero-title-line">데일리 스킨케어로 시작하는</span>
-                <span className="hero-title-line">아름다운 하루</span>
+                <span className="hero-title-line">{t('heroTitleLine1')}</span>
+                <span className="hero-title-line">{t('heroTitleLine2')}</span>
               </h1>
-              <p className="hero-description">
-                쇼핑몰 데모에 오신 것을 환영합니다. 다양한 상품을 만나보세요.
-              </p>
+              <p className="hero-description">{t('heroDescription')}</p>
               <button type="button" className="hero-cta" onClick={handleShopClick}>
-                SHOP NOW
+                {t('heroCta')}
               </button>
             </div>
             <div className="hero-visual">
               <img
                 src="/hero-banner.png"
-                alt="데일리 스킨케어 라이프스타일"
+                alt={t('heroImageAlt')}
                 className="hero-image"
               />
             </div>
           </section>
 
           <section className="promo-strip">
-            <p>Our mission is to provide skincare that honors your natural beauty.</p>
+            <p>{t('promoText')}</p>
           </section>
 
           <section className="product-section">
-            <h2>BEST SELLERS</h2>
-            {isLoadingBestSellers && <p className="product-section-status">불러오는 중...</p>}
+            <h2>{t('bestSellers')}</h2>
+            {isLoadingBestSellers && <p className="product-section-status">{t('loading')}</p>}
             {bestSellersError && <p className="product-section-error">{bestSellersError}</p>}
             {!isLoadingBestSellers && !bestSellersError && bestSellers.length === 0 && (
-              <p className="product-section-status">등록된 상품이 없습니다.</p>
+              <p className="product-section-status">{t('noProducts')}</p>
             )}
             {!isLoadingBestSellers && !bestSellersError && bestSellers.length > 0 && (
               <div className="product-grid">
@@ -352,9 +359,9 @@ function Main() {
       <footer className="site-footer">
         <div className="site-footer-inner">
           <p className="site-footer-brand">Shopping Mall Demo</p>
-          <p className="site-footer-text">고객센터 1588-0000 · 운영시간 평일 09:00 - 18:00 (주말/공휴일 휴무)</p>
+          <p className="site-footer-text">{t('footerContact')}</p>
           <p className="site-footer-copy">
-            © {new Date().getFullYear()} Shopping Mall Demo. All rights reserved.
+            {t('footerCopy', { year: new Date().getFullYear() })}
           </p>
         </div>
       </footer>

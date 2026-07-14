@@ -26,6 +26,24 @@ export async function apiFetch(path, options = {}) {
   return data
 }
 
+export function getKakaoLoginUrl() {
+  const base = import.meta.env.VITE_API_URL || '/api'
+  return `${base}/auth/kakao`
+}
+
+export function getGoogleLoginUrl() {
+  const base = import.meta.env.VITE_API_URL || '/api'
+  return `${base}/auth/google`
+}
+
+export function getGeoLocation() {
+  return apiFetch('/geo')
+}
+
+export function getCurrentUser() {
+  return apiFetch('/users/me')
+}
+
 export function checkUsername(username) {
   const params = new URLSearchParams({ username })
   return apiFetch(`/users/check-username?${params.toString()}`)

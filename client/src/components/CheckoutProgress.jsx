@@ -1,16 +1,18 @@
+import { useLanguage } from '@/i18n/LanguageContext'
 import './CheckoutProgress.css'
 
-const STEPS = [
-  { step: 1, label: '배송정보' },
-  { step: 2, label: '결제정보' },
-  { step: 3, label: '주문완료' },
-]
-
 function CheckoutProgress({ currentStep }) {
+  const { t } = useLanguage()
+  const steps = [
+    { step: 1, label: t('checkoutProgressShipping') },
+    { step: 2, label: t('checkoutProgressPayment') },
+    { step: 3, label: t('checkoutProgressComplete') },
+  ]
+
   return (
-    <nav className="checkout-progress" aria-label="주문 진행 단계">
+    <nav className="checkout-progress" aria-label={t('checkoutTitle')}>
       <ol className="checkout-progress-list">
-        {STEPS.map(({ step, label }, index) => {
+        {steps.map(({ step, label }, index) => {
           const isActive = step === currentStep
           const isComplete = step < currentStep
 
@@ -29,7 +31,7 @@ function CheckoutProgress({ currentStep }) {
                 {step}
               </span>
               <span className="checkout-progress-label">{label}</span>
-              {index < STEPS.length - 1 && (
+              {index < steps.length - 1 && (
                 <span className="checkout-progress-line" aria-hidden="true" />
               )}
             </li>

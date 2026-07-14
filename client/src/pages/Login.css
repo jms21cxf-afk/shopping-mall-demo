@@ -173,6 +173,12 @@
   color: #191919;
 }
 
+.social-button--google {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
 .social-icon {
   display: inline-flex;
   align-items: center;
@@ -195,6 +201,11 @@
   width: 18px;
   height: 18px;
   fill: #191919;
+}
+
+.social-icon--google svg {
+  width: 18px;
+  height: 18px;
 }
 
 .login-links {

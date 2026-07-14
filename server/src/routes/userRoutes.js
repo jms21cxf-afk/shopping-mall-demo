@@ -1,7 +1,9 @@
 const express = require('express');
+const { protect } = require('../middleware/authMiddleware');
 const {
   getUsers,
   getUserById,
+  getCurrentUser,
   checkUsername,
   loginUser,
   createUser,
@@ -11,6 +13,7 @@ const {
 
 const router = express.Router();
 
+router.get('/me', protect, getCurrentUser);
 router.get('/', getUsers);
 router.get('/check-username', checkUsername);
 router.post('/signup', createUser);

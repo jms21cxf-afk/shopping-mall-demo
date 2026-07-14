@@ -21,9 +21,23 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    kakaoId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     password: {
       type: String,
-      required: true,
+      required: function requiredPassword() {
+        return !this.kakaoId && !this.googleId;
+      },
     },
     userType: {
       type: String,
