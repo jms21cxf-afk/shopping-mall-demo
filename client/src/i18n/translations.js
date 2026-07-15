@@ -67,6 +67,26 @@ export const translations = {
     loginFailed: '로그인에 실패했습니다.',
     loginOAuthRequired:
       '{{provider}} 로그인은 OAuth 연동이 필요합니다. 현재 서버에는 아이디/비밀번호 로그인 API만 구현되어 있습니다.',
+    twoFactorWaitingTitle: '로그인 확인',
+    twoFactorWaitingMessage: '휴대폰에서 로그인 요청을 확인해 주세요.',
+    twoFactorDeviceLine: '기기: {{device}}',
+    twoFactorLocationLine: '위치: {{location}}',
+    twoFactorPhoneHint: '폰에서 QR 코드를 스캔하거나 아래 링크를 열어 주세요.',
+    twoFactorOpenOnPhone: '휴대폰에서 승인하기',
+    twoFactorPolling: '휴대폰 승인을 기다리는 중...',
+    twoFactorDenied: '로그인이 거절되었습니다.',
+    twoFactorExpired: '로그인 확인 시간이 만료되었습니다. 다시 로그인해 주세요.',
+    twoFactorBackToLogin: '로그인으로 돌아가기',
+    twoFactorApproveTitle: '로그인 요청',
+    twoFactorApproveQuestion: 'Shopping Mall Demo에 로그인하려고 합니까?',
+    twoFactorApproveYes: '예, 본인입니다',
+    twoFactorApproveNo: '아니요',
+    twoFactorApproved: '로그인이 승인되었습니다. PC 화면으로 돌아가 주세요.',
+    twoFactorApproveFailed: '로그인 승인에 실패했습니다.',
+    twoFactorCompleteFailed: '로그인을 완료하지 못했습니다.',
+    twoFactorMissingChallenge: '로그인 확인 정보가 없습니다.',
+    twoFactorLocalhostHint:
+      '폰에서 QR을 쓰려면 client/.env에 VITE_PUBLIC_URL=http://내PCIP:5173 을 넣고 서버를 재시작하세요. PC와 폰이 같은 Wi-Fi에 있어야 합니다.',
 
     // Signup
     signupTitle: '회원가입',
@@ -263,6 +283,7 @@ export const translations = {
     // OAuth callbacks
     kakaoLoginProcessing: '카카오 로그인 처리 중...',
     googleLoginProcessing: '구글 로그인 처리 중...',
+    naverLoginProcessing: '네이버 로그인 처리 중...',
 
     // Common
     free: '무료',
@@ -342,6 +363,26 @@ export const translations = {
     loginFailed: 'Login failed.',
     loginOAuthRequired:
       '{{provider}} login requires OAuth integration. Only username/password login is currently available on the server.',
+    twoFactorWaitingTitle: 'Verify sign-in',
+    twoFactorWaitingMessage: 'Check the sign-in request on your phone.',
+    twoFactorDeviceLine: 'Device: {{device}}',
+    twoFactorLocationLine: 'Location: {{location}}',
+    twoFactorPhoneHint: 'Scan the QR code on your phone or open the link below.',
+    twoFactorOpenOnPhone: 'Approve on phone',
+    twoFactorPolling: 'Waiting for phone approval...',
+    twoFactorDenied: 'Sign-in was denied.',
+    twoFactorExpired: 'The sign-in request expired. Please log in again.',
+    twoFactorBackToLogin: 'Back to login',
+    twoFactorApproveTitle: 'Sign-in request',
+    twoFactorApproveQuestion: 'Are you trying to sign in to Shopping Mall Demo?',
+    twoFactorApproveYes: 'Yes, it is me',
+    twoFactorApproveNo: 'No',
+    twoFactorApproved: 'Sign-in approved. You can return to your computer.',
+    twoFactorApproveFailed: 'Failed to approve sign-in.',
+    twoFactorCompleteFailed: 'Could not complete sign-in.',
+    twoFactorMissingChallenge: 'Missing sign-in verification details.',
+    twoFactorLocalhostHint:
+      'To use QR on your phone, set VITE_PUBLIC_URL=http://YOUR_PC_IP:5173 in client/.env and restart the dev server. Your phone and PC must be on the same Wi-Fi.',
 
     // Signup
     signupTitle: 'Sign up',
@@ -539,6 +580,7 @@ export const translations = {
     // OAuth callbacks
     kakaoLoginProcessing: 'Processing Kakao login...',
     googleLoginProcessing: 'Processing Google login...',
+    naverLoginProcessing: 'Processing Naver login...',
 
     // Common
     free: 'Free',
@@ -617,6 +659,26 @@ export const translations = {
     loginRequiredFields: '请输入用户名和密码。',
     loginFailed: '登录失败。',
     loginOAuthRequired: '{{provider}} 登录需要 OAuth 集成。当前服务器仅支持用户名/密码登录。',
+    twoFactorWaitingTitle: '登录确认',
+    twoFactorWaitingMessage: '请在手机上确认登录请求。',
+    twoFactorDeviceLine: '设备：{{device}}',
+    twoFactorLocationLine: '位置：{{location}}',
+    twoFactorPhoneHint: '请用手机扫描二维码或打开下方链接。',
+    twoFactorOpenOnPhone: '在手机上批准',
+    twoFactorPolling: '等待手机批准...',
+    twoFactorDenied: '登录已被拒绝。',
+    twoFactorExpired: '登录确认已过期，请重新登录。',
+    twoFactorBackToLogin: '返回登录',
+    twoFactorApproveTitle: '登录请求',
+    twoFactorApproveQuestion: '您正在尝试登录 Shopping Mall Demo 吗？',
+    twoFactorApproveYes: '是的，是我',
+    twoFactorApproveNo: '不是',
+    twoFactorApproved: '登录已批准，请返回电脑。',
+    twoFactorApproveFailed: '批准登录失败。',
+    twoFactorCompleteFailed: '无法完成登录。',
+    twoFactorMissingChallenge: '缺少登录确认信息。',
+    twoFactorLocalhostHint:
+      '要在手机上扫描二维码，请在 client/.env 中设置 VITE_PUBLIC_URL=http://你的电脑IP:5173 并重启开发服务器。手机和电脑需在同一 Wi-Fi。',
 
     // Signup
     signupTitle: '注册',
@@ -812,6 +874,7 @@ export const translations = {
     // OAuth callbacks
     kakaoLoginProcessing: '正在处理 Kakao 登录...',
     googleLoginProcessing: '正在处理 Google 登录...',
+    naverLoginProcessing: '正在处理 Naver 登录...',
 
     // Common
     free: '免费',

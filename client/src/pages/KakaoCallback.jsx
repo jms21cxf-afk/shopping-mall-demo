@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLanguage } from '@/i18n/LanguageContext'
-import { getCurrentUser } from '@/api/client'
-import { saveAuth } from '@/utils/auth'
 import './Login.css'
 
 function KakaoCallback() {
@@ -12,38 +10,21 @@ function KakaoCallback() {
   const [message, setMessage] = useState(() => t('kakaoLoginProcessing'))
 
   useEffect(() => {
-    const completeLogin = async () => {
-      const error = searchParams.get('error')
+    const error = searchParams.get('error')
 
-      if (error) {
-        navigate(`/login?error=${encodeURIComponent(error)}`, { replace: true })
-        return
-      }
-
-      const token = searchParams.get('token')
-
-      if (!token) {
-        navigate(`/login?error=${encodeURIComponent('로그인 정보가 없습니다.')}`, { replace: true })
-        return
-      }
-
-      localStorage.setItem('token', token)
-
-      try {
-        const user = await getCurrentUser()
-        saveAuth(token, user)
-        navigate('/', { replace: true })
-      } catch (fetchError) {
-        localStorage.removeItem('token')
-        setMessage(fetchError.message || '사용자 정보를 불러오지 못했습니다.')
-        navigate(
-          `/login?error=${encodeURIComponent(fetchError.message || '사용자 정보를 불러오지 못했습니다.')}`,
-          { replace: true },
-        )
-      }
+    if (error) {
+      navigate(`/login?error=${encodeURIComponent(error)}`, { replace: true })
+      return
     }
 
-    completeLogin()
+    const challenge = searchParams.get('challenge')
+
+    if (challenge) {
+      navigate(`/login/verify?challenge=${encodeURIComponent(challenge)}`, { replace: true })
+      return
+    }
+
+    navigate(`/login?error=${encodeURIComponent('로그인 정보가 없습니다.')}`, { replace: true })
   }, [navigate, searchParams])
 
   return (

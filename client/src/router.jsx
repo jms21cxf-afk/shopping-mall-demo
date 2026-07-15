@@ -1,8 +1,11 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Main from '@/pages/Main'
 import Login from '@/pages/Login'
+import LoginVerify from '@/pages/LoginVerify'
+import LoginApprove from '@/pages/LoginApprove'
 import KakaoCallback from '@/pages/KakaoCallback'
 import GoogleCallback from '@/pages/GoogleCallback'
+import NaverCallback from '@/pages/NaverCallback'
 import Signup from '@/pages/Signup'
 import Admin from '@/pages/admin/Admin'
 import Users from '@/pages/admin/Users'
@@ -46,12 +49,24 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: '/login/verify',
+    element: <LoginVerify />,
+  },
+  {
+    path: '/login/approve',
+    element: <LoginApprove />,
+  },
+  {
     path: '/auth/kakao/callback',
     element: <KakaoCallback />,
   },
   {
     path: '/auth/google/callback',
     element: <GoogleCallback />,
+  },
+  {
+    path: '/auth/naver/callback',
+    element: <NaverCallback />,
   },
   {
     path: '/signup',

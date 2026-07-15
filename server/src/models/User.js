@@ -33,10 +33,16 @@ const userSchema = new mongoose.Schema(
       sparse: true,
       trim: true,
     },
+    naverId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     password: {
       type: String,
       required: function requiredPassword() {
-        return !this.kakaoId && !this.googleId;
+        return !this.kakaoId && !this.googleId && !this.naverId;
       },
     },
     userType: {

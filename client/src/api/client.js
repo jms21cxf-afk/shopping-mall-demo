@@ -36,8 +36,14 @@ export function getGoogleLoginUrl() {
   return `${base}/auth/google`
 }
 
-export function getGeoLocation() {
-  return apiFetch('/geo')
+export function getNaverLoginUrl() {
+  const base = import.meta.env.VITE_API_URL || '/api'
+  return `${base}/auth/naver`
+}
+
+export function getGeoLocation(countryCode) {
+  const params = countryCode ? `?country=${encodeURIComponent(countryCode)}` : ''
+  return apiFetch(`/geo${params}`)
 }
 
 export function getCurrentUser() {
@@ -68,6 +74,28 @@ export function loginUser(credentials) {
   return apiFetch('/users/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
+  })
+}
+
+export function getLoginChallenge(challengeId) {
+  return apiFetch(`/auth/challenge/${encodeURIComponent(challengeId)}`)
+}
+
+export function approveLoginChallenge(challengeId) {
+  return apiFetch(`/auth/challenge/${encodeURIComponent(challengeId)}/approve`, {
+    method: 'POST',
+  })
+}
+
+export function denyLoginChallenge(challengeId) {
+  return apiFetch(`/auth/challenge/${encodeURIComponent(challengeId)}/deny`, {
+    method: 'POST',
+  })
+}
+
+export function completeLoginChallenge(challengeId) {
+  return apiFetch(`/auth/challenge/${encodeURIComponent(challengeId)}/complete`, {
+    method: 'POST',
   })
 }
 

@@ -3,11 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLanguage } from '@/i18n/LanguageContext'
 import './Login.css'
 
-function GoogleCallback() {
+function NaverCallback() {
   const navigate = useNavigate()
   const { t } = useLanguage()
   const [searchParams] = useSearchParams()
-  const [message, setMessage] = useState(() => t('googleLoginProcessing'))
+  const [message, setMessage] = useState(() => t('naverLoginProcessing'))
 
   useEffect(() => {
     const error = searchParams.get('error')
@@ -36,4 +36,4 @@ function GoogleCallback() {
   )
 }
 
-export default GoogleCallback
+export default NaverCallback

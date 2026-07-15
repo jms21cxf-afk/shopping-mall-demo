@@ -1,60 +1,30 @@
-function getClientIp(req) {
-  const forwarded = req.headers['x-forwarded-for'];
+const { getClientIp } = require('../utils/requestMeta');
+const { isPrivateIp, lookupGeoByIp } = require('../utils/geoLookup');
 
-  if (typeof forwarded === 'string' && forwarded.length > 0) {
-    return forwarded.split(',')[0].trim();
-  }
-
-  return req.ip || req.socket?.remoteAddress || '';
-}
-
-function normalizeIp(ip) {
-  return ip.replace('::ffff:', '');
-}
-
-function isPrivateIp(ip) {
-  const normalized = normalizeIp(ip);
-
-  if (!normalized) return true;
-  if (normalized === '127.0.0.1' || normalized === '::1') return true;
-  if (normalized.startsWith('10.')) return true;
-  if (normalized.startsWith('192.168.')) return true;
-  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(normalized)) return true;
-
-  return false;
-}
-
-async function fetchGeoFromIpApi(ip) {
-  const url = ip
-    ? `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,message,country,countryCode,regionName,city`
-    : 'http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city';
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error('Location lookup failed');
-  }
-
-  const data = await response.json();
-
-  if (data.status !== 'success') {
-    throw new Error(data.message || 'Location lookup failed');
-  }
-
-  return {
-    country: data.country,
-    countryCode: data.countryCode,
-    region: data.regionName || '',
-    city: data.city || '',
-  };
-}
+const MOCK_GEO = {
+  KR: { country: 'South Korea', countryCode: 'KR', region: 'Seoul', city: 'Seoul' },
+  US: { country: 'United States', countryCode: 'US', region: 'California', city: 'Los Angeles' },
+  JP: { country: 'Japan', countryCode: 'JP', region: 'Tokyo', city: 'Tokyo' },
+  CN: { country: 'China', countryCode: 'CN', region: 'Beijing', city: 'Beijing' },
+  GB: { country: 'United Kingdom', countryCode: 'GB', region: 'England', city: 'London' },
+  FR: { country: 'France', countryCode: 'FR', region: 'Île-de-France', city: 'Paris' },
+};
 
 const getGeoLocation = async (req, res) => {
   try {
+    const mockCode = req.query.country?.trim().toUpperCase();
+
+    if (process.env.NODE_ENV !== 'production' && mockCode && MOCK_GEO[mockCode]) {
+      return res.json({
+        ...MOCK_GEO[mockCode],
+        isMock: true,
+        isLocalDev: true,
+      });
+    }
+
     const clientIp = getClientIp(req);
     const usePublicFallback = isPrivateIp(clientIp);
-
-    const geo = await fetchGeoFromIpApi(usePublicFallback ? null : clientIp);
+    const geo = await lookupGeoByIp(usePublicFallback ? '' : clientIp);
 
     res.json({
       ...geo,

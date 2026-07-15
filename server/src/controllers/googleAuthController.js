@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const { createLoginChallenge } = require('../services/loginChallengeService');
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -34,7 +34,7 @@ const startGoogleLogin = (req, res) => {
       response_type: 'code',
       scope: 'openid email profile',
       access_type: 'online',
-      prompt: 'select_account',
+      prompt: 'login',
     });
 
     res.redirect(`${GOOGLE_AUTH_URL}?${params}`);
@@ -126,8 +126,8 @@ const handleGoogleCallback = async (req, res) => {
       await user.save();
     }
 
-    const token = generateToken(user);
-    const params = new URLSearchParams({ token });
+    const challengeId = await createLoginChallenge(user, req);
+    const params = new URLSearchParams({ challenge: challengeId });
     res.redirect(`${clientUrl}/auth/google/callback?${params}`);
   } catch (callbackError) {
     redirectWithError(res, clientUrl, callbackError.message || '구글 로그인에 실패했습니다.');

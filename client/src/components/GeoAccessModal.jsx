@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getGeoLocation } from '@/api/client'
 import {
   countryCodeToFlag,
@@ -6,6 +6,11 @@ import {
   getSuggestedLanguage,
 } from '@/i18n/geoUtils'
 import { useLanguage } from '@/i18n/LanguageContext'
+import {
+  GEO_MOCK_OPTIONS,
+  getGeoMockCountry,
+  setGeoMockCountry,
+} from '@/utils/geoMock'
 import './GeoAccessModal.css'
 
 function GeoAccessModal({ isOpen, onClose }) {
@@ -13,30 +18,41 @@ function GeoAccessModal({ isOpen, onClose }) {
   const [geo, setGeo] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [mockCountry, setMockCountry] = useState(() => getGeoMockCountry())
+
+  const loadGeo = useCallback(
+    (countryCode) => {
+      setIsLoading(true)
+      setError('')
+      setGeo(null)
+
+      return getGeoLocation(countryCode || undefined)
+        .then((data) => {
+          setGeo(data)
+        })
+        .catch((fetchError) => {
+          setError(fetchError.message || t('geoModalError'))
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    },
+    [t],
+  )
 
   useEffect(() => {
     if (!isOpen) return
 
-    let cancelled = false
-    setIsLoading(true)
-    setError('')
-    setGeo(null)
+    setMockCountry(getGeoMockCountry())
+    loadGeo(getGeoMockCountry())
+  }, [isOpen, loadGeo])
 
-    getGeoLocation()
-      .then((data) => {
-        if (!cancelled) setGeo(data)
-      })
-      .catch((fetchError) => {
-        if (!cancelled) setError(fetchError.message || t('geoModalError'))
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [isOpen, t])
+  const handleMockChange = (event) => {
+    const nextCountry = event.target.value
+    setMockCountry(nextCountry)
+    setGeoMockCountry(nextCountry)
+    loadGeo(nextCountry)
+  }
 
   if (!isOpen) return null
 
@@ -71,6 +87,25 @@ function GeoAccessModal({ isOpen, onClose }) {
           {t('geoModalWelcome')}
         </h2>
 
+        {import.meta.env.DEV && (
+          <div className="geo-modal-dev">
+            <label htmlFor="geo-mock-country">테스트 위치 (개발용)</label>
+            <select
+              id="geo-mock-country"
+              className="geo-modal-dev-select"
+              value={mockCountry}
+              onChange={handleMockChange}
+            >
+              {GEO_MOCK_OPTIONS.map((option) => (
+                <option key={option.code || 'real'} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p className="geo-modal-dev-hint">URL: ?geo=US (예: 미국)</p>
+          </div>
+        )}
+
         {isLoading && <p className="geo-modal-message">{t('geoModalLoading')}</p>}
 
         {error && !isLoading && <p className="geo-modal-error">{error}</p>}
@@ -81,7 +116,9 @@ function GeoAccessModal({ isOpen, onClose }) {
               {t('geoModalGreeting', { country: countryName, flag })}
             </p>
             <p className="geo-modal-submessage">{t('geoModalQuestion')}</p>
-            {geo.isLocalDev && <p className="geo-modal-note">{t('geoModalLocalDevNote')}</p>}
+            {(geo.isLocalDev || geo.isMock) && (
+              <p className="geo-modal-note">{t('geoModalLocalDevNote')}</p>
+            )}
             <p className="geo-modal-access">{t('geoAccessingFrom', { country: countryName, flag })}</p>
           </>
         )}

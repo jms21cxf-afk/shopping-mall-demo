@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const { createLoginChallenge } = require('../services/loginChallengeService');
 
 const omitPassword = (user) => {
   const userObject = user.toObject();
@@ -80,12 +80,12 @@ const loginUser = async (req, res, next) => {
       return res.status(401).json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
     }
 
-    const token = generateToken(user);
+    const challengeId = await createLoginChallenge(user, req);
 
     res.json({
-      message: '로그인 성공',
-      token,
-      user: omitPassword(user),
+      message: '휴대폰에서 로그인 승인이 필요합니다.',
+      requiresVerification: true,
+      challengeId,
     });
   } catch (error) {
     next(error);

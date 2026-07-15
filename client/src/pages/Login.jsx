@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import PageLanguageBar from '@/components/PageLanguageBar'
-import { getGoogleLoginUrl, getKakaoLoginUrl, loginUser } from '@/api/client'
+import { getGoogleLoginUrl, getKakaoLoginUrl, getNaverLoginUrl, loginUser } from '@/api/client'
 import { useLanguage } from '@/i18n/LanguageContext'
 import { isLoggedIn, saveAuth } from '@/utils/auth'
 import './Login.css'
@@ -71,6 +71,11 @@ function Login() {
         password: form.password,
       })
 
+      if (result.requiresVerification && result.challengeId) {
+        navigate(`/login/verify?challenge=${encodeURIComponent(result.challengeId)}`)
+        return
+      }
+
       saveAuth(result.token, result.user)
       navigate('/')
     } catch (loginError) {
@@ -88,7 +93,16 @@ function Login() {
     window.location.href = getGoogleLoginUrl()
   }
 
+  const handleNaverLogin = () => {
+    window.location.href = getNaverLoginUrl()
+  }
+
   const handleSocialLogin = (provider) => {
+    if (provider === 'naver') {
+      handleNaverLogin()
+      return
+    }
+
     if (provider === 'kakao') {
       handleKakaoLogin()
       return
@@ -98,8 +112,6 @@ function Login() {
       handleGoogleLogin()
       return
     }
-
-    setError(t('loginOAuthRequired', { provider: t('loginNaver') }))
   }
 
   return (

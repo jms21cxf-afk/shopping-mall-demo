@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const { createLoginChallenge } = require('../services/loginChallengeService');
 
 const KAKAO_AUTH_URL = 'https://kauth.kakao.com/oauth/authorize';
 const KAKAO_TOKEN_URL = 'https://kauth.kakao.com/oauth/token';
@@ -32,6 +32,7 @@ const startKakaoLogin = (req, res) => {
       client_id: restApiKey,
       redirect_uri: redirectUri,
       response_type: 'code',
+      scope: 'profile_nickname',
     });
 
     res.redirect(`${KAKAO_AUTH_URL}?${params}`);
@@ -95,12 +96,14 @@ const handleKakaoCallback = async (req, res) => {
     }
 
     const kakaoId = String(kakaoUser.id);
+    const email =
+      kakaoUser.kakao_account?.email?.trim().toLowerCase() || `kakao_${kakaoId}@kakao.local`;
     const nickname =
       kakaoUser.kakao_account?.profile?.nickname ||
       kakaoUser.properties?.nickname ||
-      '카카오 사용자';
-    const email =
-      kakaoUser.kakao_account?.email?.trim().toLowerCase() || `kakao_${kakaoId}@kakao.local`;
+      kakaoUser.properties?.['property_nickname'] ||
+      null;
+    const displayName = nickname?.trim() || email.split('@')[0] || '카카오 사용자';
     const username = `kakao_${kakaoId}`;
 
     let user = await User.findOne({ kakaoId });
@@ -122,17 +125,17 @@ const handleKakaoCallback = async (req, res) => {
         kakaoId,
         email,
         username,
-        name: nickname,
+        name: displayName,
         password: randomPassword,
         userType: 'customer',
       });
-    } else if (user.name !== nickname) {
-      user.name = nickname;
+    } else if (user.name !== displayName) {
+      user.name = displayName;
       await user.save();
     }
 
-    const token = generateToken(user);
-    const params = new URLSearchParams({ token });
+    const challengeId = await createLoginChallenge(user, req);
+    const params = new URLSearchParams({ challenge: challengeId });
     res.redirect(`${clientUrl}/auth/kakao/callback?${params}`);
   } catch (callbackError) {
     redirectWithError(res, clientUrl, callbackError.message || '카카오 로그인에 실패했습니다.');
